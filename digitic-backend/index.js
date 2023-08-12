@@ -23,7 +23,7 @@ const fileUpload = require("express-fileupload");
 const path=require("path")
 dbConnect();
 app.use(morgan("dev"));
-  app.use(cors({ origin: "https://amazonfrontend.vercel.app" }));
+  app.use(cors({ origin: "https://amazonfrontend-two.vercel.app" }));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(bodyParser.json());
