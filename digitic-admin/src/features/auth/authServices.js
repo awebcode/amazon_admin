@@ -2,7 +2,9 @@ import axios from "axios";
 import { config } from "../../utils/axiosconfig";
 import { base_url } from "../../utils/baseUrl";
 const login = async (user) => {
-  const response = await axios.post(`${base_url}user/admin-login`, user);
+  const response = await axios.post(`${base_url}user/admin-login`, user, {
+    withCredentials:"include"
+  });
   if (response.data) {
     localStorage.setItem("user", JSON.stringify(response.data));
   }
