@@ -42,10 +42,10 @@ app.use("/api/upload", uploadRouter);
 app.use(fileUpload())
 app.use(notFound);
 app.use(errorHandler);
-app.use(express.static(path.join(__dirname, "../digitic-admin/build")));
+app.use(express.static(path.join(__dirname, "./digitic-admin/build")));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../digitic-admin/build/index.html"));
+  res.sendFile(path.resolve(__dirname, "./digitic-admin/build/index.html"));
 });
 app.listen(PORT, () => {
   console.log(`Server is running  at PORT ${PORT}`);
