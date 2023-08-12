@@ -7,12 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { login } from "../features/auth/authSlice";
 
 let schema = yup.object().shape({
-  email: yup
-    .string()
-    .email("Email should be valid")
-    .required("Email is Required"),
+  email: yup.string().email("Email should be valid").required("Email is Required"),
   password: yup.string().required("Password is Required"),
 });
+
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -37,57 +35,55 @@ const Login = () => {
       navigate("");
     }
   }, [user, isError, isSuccess, isLoading]);
+
   return (
     <div className="py-5" style={{ background: "#ffd333", minHeight: "100vh" }}>
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <div className="my-5 w-25 bg-white rounded-3 mx-auto p-4">
-        <h3 className="text-center title">Login</h3>
-        <p className="text-center">Login to your account to continue.</p>
-        <div className="error text-center">
-          {message.message == "Rejected" ? "You are not an Admin" : ""}
+      <div className="container mx-auto p-20">
+        <div className="my-5 w-full md:w-1/2 lg:w-1/3 bg-white rounded-lg mx-auto p-4">
+          <h3 className="text-center text-xl md:text-2xl font-bold">Login</h3>
+          <p className="text-center mb-4">Dear Admin,Login to your account to continue.</p>
+          <div className="error text-center mb-2">
+            {message.message === "Rejected" ? "You are not an Admin" : ""}
+          </div>
+          <form onSubmit={formik.handleSubmit}>
+            <CustomInput
+              type="text"
+              label="Email Address"
+              id="email"
+              name="email"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.email}
+            />
+            <div className="error mt-2">
+              {formik.touched.email && formik.errors.email}
+            </div>
+            <CustomInput
+              type="password"
+              label="Password"
+              id="pass"
+              name="password"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.password}
+            />
+            <div className="error mt-2">
+              {formik.touched.password && formik.errors.password}
+            </div>
+            <div className="mb-3 text-end">
+              <Link to="forgot-password" className="text-sm">
+                Forgot Password?
+              </Link>
+            </div>
+            <button
+              className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 w-full rounded-md transition duration-300"
+              type="submit"
+              style={{ background: "#ffd333",display:"block",margin:"auto",padding:"12px 58px",width:"40%" }}
+            >
+              Login
+            </button>
+          </form>
         </div>
-        <form action="" onSubmit={formik.handleSubmit}>
-          <CustomInput
-            type="text"
-            label="Email Address"
-            id="email"
-            name="email"
-            onChng={formik.handleChange("email")}
-            onBlr={formik.handleBlur("email")}
-            val={formik.values.email}
-          />
-          <div className="error mt-2">
-            {formik.touched.email && formik.errors.email}
-          </div>
-          <CustomInput
-            type="password"
-            label="Password"
-            id="pass"
-            name="password"
-            onChng={formik.handleChange("password")}
-            onBlr={formik.handleBlur("password")}
-            val={formik.values.password}
-          />
-          <div className="error mt-2">
-            {formik.touched.password && formik.errors.password}
-          </div>
-          <div className="mb-3 text-end">
-            <Link to="forgot-password" className="">
-              Forgot Password?
-            </Link>
-          </div>
-          <button
-            className="border-0 px-3 py-2 text-white fw-bold w-100 text-center text-decoration-none fs-5"
-            style={{ background: "#ffd333" }}
-            type="submit"
-          >
-            Login
-          </button>
-        </form>
       </div>
     </div>
   );
