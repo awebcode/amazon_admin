@@ -40,22 +40,22 @@ app.use("/api/color", colorRouter);
 app.use("/api/enquiry", enqRouter);
 app.use("/api/upload", uploadRouter);
 
-app.get("/", (req, res) => {
-  res.json("<h1>Hello World</h1>")
-})
+// app.get("/", (req, res) => {
+//   res.json("<h1>Hello World</h1>")
+// })
 //build for vercel
-// app.use(express.static(path.join(__dirname, "../digitic-admin/build")));
+app.use(express.static(path.join(__dirname, "../digitic-admin/build")));
 
-// app.get("*", function (_, res) {
-//   res.sendFile(path.join(__dirname, "../digitic-admin/build/index.html"), function (err) {
-//     if (err) {
-//       res.status(500).send(err);
-//     }
-//   });
-// });
+app.get("*", function (_, res) {
+  res.sendFile(path.join(__dirname, "../digitic-admin/build/index.html"), function (err) {
+    if (err) {
+      res.status(500).send(err);
+    }
+  });
+});
 app.use(fileUpload());
 app.use(notFound);
-app.use(errorHandler);
+ app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running  at PORT ${PORT}`);
