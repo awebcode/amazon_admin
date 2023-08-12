@@ -23,6 +23,7 @@ const uploadImages = asyncHandler(async (req, res) => {
     });
     res.json(images);
   } catch (error) {
+    console.log(error)
     throw new Error(error);
   }
 });
