@@ -41,7 +41,9 @@ app.use("/api/enquiry", enqRouter);
 app.use("/api/upload", uploadRouter);
 app.use(fileUpload())
 app.use(notFound);
-
+app.get("/", (req, res) => {
+  res.json("<h1>Hello World</h1>")
+})
 //build for vercel
 app.use(express.static(path.join(__dirname, "../digitic-admin/build")));
 
