@@ -32,7 +32,7 @@ app.use(cookieParser());
 // app.use(fileUpload());
 app.use(
   cors({
-    origin: "https://amazonfrontend-two.vercel.app", //
+    origin: "https://adminamazon.vercel.app", //
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
