@@ -1,1 +1,1 @@
-export const base_url = "https://amazonadmin.vercel.app/";
+export const base_url = "https://amazonadmin-backend.onrender.com";
