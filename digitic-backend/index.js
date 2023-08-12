@@ -39,8 +39,7 @@ app.use("/api/coupon", couponRouter);
 app.use("/api/color", colorRouter);
 app.use("/api/enquiry", enqRouter);
 app.use("/api/upload", uploadRouter);
-app.use(fileUpload())
-app.use(notFound);
+
 app.get("/", (req, res) => {
   res.json("<h1>Hello World</h1>")
 })
@@ -54,7 +53,10 @@ app.get("/", (req, res) => {
 //     }
 //   });
 // });
+app.use(fileUpload());
+app.use(notFound);
 app.use(errorHandler);
+
 app.listen(PORT, () => {
   console.log(`Server is running  at PORT ${PORT}`);
 });
