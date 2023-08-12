@@ -8,7 +8,7 @@ export const config = {
       getTokenFromLocalStorage !== null ? getTokenFromLocalStorage.token : ""
     }`,
     Accept: "multipart/form-data",
-    "Content-Type": "application/json",
+    
   },
   withCredentials: true,
 };
