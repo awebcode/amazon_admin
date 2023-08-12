@@ -5,7 +5,7 @@ const { notFound, errorHandler } = require("./middlewares/errorHandler");
 const app = express();
 const dotenv = require("dotenv").config();
 
-const PORT =process.env.PORT;
+const PORT = process.env.PORT;
 const authRouter = require("./routes/authRoute");
 const productRouter = require("./routes/productRoute");
 const blogRouter = require("./routes/blogRoute");
@@ -20,16 +20,24 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
-const path=require("path")
+const path = require("path");
 dbConnect();
 app.use(morgan("dev"));
-   app.use(cors({ origin: "https://amazonfrontend-two.vercel.app",credentials:true }));
+
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(fileUpload());
+app.use(
+  cors({
+    origin: "https://amazonfrontend-two.vercel.app",
+    credentials: true,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type,Authorization",
+  })
+);
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
@@ -42,13 +50,12 @@ app.use("/api/enquiry", enqRouter);
 app.use("/api/upload", uploadRouter);
 
 app.get("/", (req, res) => {
-  res.json("<h1>Hello World</h1>")
-})
+  res.json("<h1>Hello World</h1>");
+});
 //build for vercel
 
-
 app.use(notFound);
- app.use(errorHandler);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running  at PORT ${PORT}`);
