@@ -23,12 +23,13 @@ const fileUpload = require("express-fileupload");
 const path=require("path")
 dbConnect();
 app.use(morgan("dev"));
-//  app.use(cors());
+  app.use(cors({ origin: "https://amazonfrontend.vercel.app" }));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(fileUpload());
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
@@ -40,20 +41,12 @@ app.use("/api/color", colorRouter);
 app.use("/api/enquiry", enqRouter);
 app.use("/api/upload", uploadRouter);
 
-// app.get("/", (req, res) => {
-//   res.json("<h1>Hello World</h1>")
-// })
+app.get("/", (req, res) => {
+  res.json("<h1>Hello World</h1>")
+})
 //build for vercel
-app.use(express.static(path.join(__dirname, "./build")));
 
-app.get("*", function (_, res) {
-  res.sendFile(path.join(__dirname, "./build/index.html"), function (err) {
-    if (err) {
-      res.status(500).send(err);
-    }
-  });
-});
-app.use(fileUpload());
+
 app.use(notFound);
  app.use(errorHandler);
 
