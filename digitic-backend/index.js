@@ -29,10 +29,10 @@ app.use(express.urlencoded());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(fileUpload());
+// app.use(fileUpload());
 app.use(
   cors({
-    origin: "https://amazonfrontend-two.vercel.app",
+    origin: "https://amazonfrontend-two.vercel.app", //
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
