@@ -10,7 +10,6 @@ let schema = yup.object().shape({
   email: yup.string().email("Email should be valid").required("Email is Required"),
   password: yup.string().required("Password is Required"),
 });
-
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -41,7 +40,9 @@ const Login = () => {
       <div className="container mx-auto p-20">
         <div className="my-5 w-full md:w-1/2 lg:w-1/3 bg-white rounded-lg mx-auto p-4">
           <h3 className="text-center text-xl md:text-2xl font-bold">Login</h3>
-          <p className="text-center mb-4">Dear Admin,Login to your account to continue.</p>
+          <p className="text-center mb-4">
+            Dear Admin,Login to your account to continue.
+          </p>
           <div className="error text-center mb-2">
             {message.message === "Rejected" ? "You are not an Admin" : ""}
           </div>
@@ -51,9 +52,9 @@ const Login = () => {
               label="Email Address"
               id="email"
               name="email"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.email}
+              onChng={formik.handleChange("email")}
+              onBlr={formik.handleBlur("email")}
+              val={formik.values.email}
             />
             <div className="error mt-2">
               {formik.touched.email && formik.errors.email}
@@ -63,9 +64,9 @@ const Login = () => {
               label="Password"
               id="pass"
               name="password"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.password}
+              onChng={formik.handleChange("password")}
+              onBlr={formik.handleBlur("password")}
+              val={formik.values.password}
             />
             <div className="error mt-2">
               {formik.touched.password && formik.errors.password}
@@ -78,9 +79,15 @@ const Login = () => {
             <button
               className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 w-full rounded-md transition duration-300"
               type="submit"
-              style={{ background: "#ffd333",display:"block",margin:"auto",padding:"12px 58px",width:"40%" }}
+              style={{
+                background: "#ffd333",
+                display: "block",
+                margin: "auto",
+                padding: "12px 58px",
+                width: "40%",
+              }}
             >
-              Login
+              {isLoading ? "Loading.....": "Login"}
             </button>
           </form>
         </div>
