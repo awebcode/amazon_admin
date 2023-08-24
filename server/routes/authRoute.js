@@ -50,7 +50,7 @@ router.post("/admin-login", loginAdmin);
 router.post("/cart", authMiddleware, userCart);
 router.post("/cart/applycoupon", authMiddleware, applyCoupon);
 router.post("/cart/cash-order", authMiddleware, createOrder);
-router.get("/all-users", getallUser);
+router.get("/all-users",authMiddleware,isSubAdmin, getallUser);
 router.get("/get-orders", authMiddleware,isSubAdmin, getOrders);
 router.get("/getallorders", authMiddleware, isSubAdmin, getAllOrders);
 router.post("/getorderbyuser/:id", authMiddleware, isSubAdmin, getAllOrders);

@@ -68,6 +68,8 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
     );
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
+      secure: true,
+      sameSite: "none",
       maxAge: 372 * 60 * 60 * 1000,
     });
     res.json({
@@ -112,6 +114,8 @@ const loginAdmin = asyncHandler(async (req, res) => {
      );
      res.cookie("refreshToken", refreshToken, {
        httpOnly: true,
+       secure: true,
+       sameSite: "none",
        maxAge: 372 * 60 * 60 * 1000,
      });
      res.json({
@@ -161,6 +165,7 @@ const logout = asyncHandler(async (req, res) => {
       res.clearCookie("refreshToken", {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
       });
       return res.sendStatus(204); // forbidden
     }
@@ -170,6 +175,7 @@ const logout = asyncHandler(async (req, res) => {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
+      sameSite:"none"
     });
     res.sendStatus(204); // forbidden
   } catch (error) {
