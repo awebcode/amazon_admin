@@ -2,18 +2,12 @@ import axios from "axios";
 import { config } from "../../utils/axiosconfig";
 import { base_url } from "../../utils/baseUrl";
 const login = async (user) => {
-  const response = await axios.post(`${base_url}user/admin-login`, user, {
-    withCredentials:true
-  });
-  // if (response.data) {
-  //   localStorage.setItem("user", JSON.stringify(response.data));
-  // }
+  const response = await axios.post(`${base_url}user/admin-login`, user, config);
+  
   return response.data;
 };
 const logout = async () => {
-  const response = await axios.get(`${base_url}user/logout`, {
-    withCredentials: true,
-  });
+  const response = await axios.get(`${base_url}user/logout`,config);
   if (response.data) {
     localStorage.removeItem("user");
   }
