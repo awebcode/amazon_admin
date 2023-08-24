@@ -7,7 +7,13 @@ const login = async (user) => {
   return response.data;
 };
 const logout = async () => {
-  const response = await axios.get(`${base_url}user/logout`,config);
+  const response = await axios.get(`${base_url}user/logout`, {
+    headers:{
+      "Content-Type":"application/json"
+  },
+    withCredentials: "true",
+    
+  });
   if (response.data) {
     localStorage.removeItem("user");
   }

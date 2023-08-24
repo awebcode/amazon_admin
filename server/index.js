@@ -36,7 +36,7 @@ app.use(
     origin: "https://adminamazon.vercel.app", //http://localhost:3000//https://adminamazon.vercel.app
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    allowedHeaders: "Content-Type",
+    allowedHeaders: "Content-Type,Authorization",
     
   })
 );

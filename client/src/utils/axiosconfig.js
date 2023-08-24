@@ -5,7 +5,7 @@
 
 export const config = {
   headers: {
-    
+    Authorization: `Bearer`,
     Accept: "multipart/form-data",
     
     
