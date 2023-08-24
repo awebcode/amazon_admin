@@ -1,0 +1,94 @@
+/* Custom Responsive CSS for UpdateUser Component */
+
+/* Container */
+.update-user-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Form */
+.update-user-form {
+  display: grid;
+  gap: 20px;
+}
+
+/* Label */
+.update-user-label {
+  font-size: 18px;
+}
+
+/* Input Fields */
+.update-user-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f8f8f8;
+  transition: border-color 0.3s ease;
+}
+
+.update-user-input:focus {
+  border-color: #007bff;
+}
+
+/* Avatar Upload */
+/* Avatar Upload Label */
+.update-user-avatar-label {
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+/* Avatar Upload */
+.update-user-avatar-upload {
+  /* display: flex;
+  flex-direction: column;
+  align-items: center; */
+  gap: 10px;
+}
+
+.update-user-avatar-preview {
+  max-width: 100%;
+  height: auto;
+}
+
+.update-user-avatar-button {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.update-user-avatar-button:hover {
+  background-color: #0056b3;
+}
+
+/* Submit Button */
+.update-user-button {
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.update-user-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Media Queries */
+@media screen and (max-width: 600px) {
+  .update-user-form {
+    grid-template-columns: 1fr;
+  }
+}
