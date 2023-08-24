@@ -28,16 +28,17 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(cookieParser());
+
 // app.use(fileUpload());
 app.use(
   cors({
     origin: "https://adminamazon.vercel.app", //http://localhost:3000//https://adminamazon.vercel.app
     credentials: true,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    // methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     // allowedHeaders: "Content-Type,Authorization",
   })
 );
+app.use(cookieParser());
 app.use("/api/user", authRouter);
 app.use("/api/product", productRouter);
 app.use("/api/blog", blogRouter);
