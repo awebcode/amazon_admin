@@ -78,7 +78,8 @@ const Brandlist = () => {
   }
   const{user}=useSelector((state)=>state.auth)
   const deleteBrand = async(e) => {
-    if ((user && user.role !== "admin") || user.role !== "sub_admin") {
+    if (user.role !== "admin" && user.role !== "sub_admin") {
+      setOpen(false);
       toast.warning("only admin can delete.");
     } else {
       const { data } = await axios.delete(`${base_url}brand/${e}`, config);
@@ -92,7 +93,7 @@ const Brandlist = () => {
   };
   return (
     <div>
-      <h3 className="mb-4 title">Brands</h3>
+      <h3 className="mb-4 title">Brands({brandState && brandState.length})</h3>
       <div>
         <Table columns={columns} dataSource={data1} />
       </div>
@@ -101,6 +102,7 @@ const Brandlist = () => {
         open={open}
         performAction={() => {
           deleteBrand(brandId);
+          dispatch(getBrands())
           
         }}
         title="Are you sure you want to delete this brand?"

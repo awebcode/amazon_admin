@@ -8,10 +8,13 @@ import { useFormik } from "formik";
 import {
   createCategory,
   getAProductCategory,
+  getCategories,
+
   resetState,
   updateAProductCategory,
 } from "../features/pcategory/pcategorySlice";
 import { getMyDetails } from "../features/auth/authSlice";
+import Categorylist from "./Categorylist";
 let schema = yup.object().shape({
   title: yup.string().required("Category Name is Required"),
 });
@@ -30,12 +33,18 @@ const Addcat = () => {
     updatedCategory,
   } = newCategory;
   useEffect(() => {
-      dispatch(getMyDetails());
+    dispatch(getCategories());
+  }, [dispatch]);
+  
+  useEffect(() => {
+    dispatch(getMyDetails());
+    dispatch(getCategories())
+    // dispatch(getCat());
 
     if (getPCatId !== undefined) {
       dispatch(getAProductCategory(getPCatId));
     } else {
-      dispatch(resetState());
+      //  dispatch(resetState());
     }
   }, [dispatch,getPCatId]);
   useEffect(() => {
@@ -44,12 +53,20 @@ const Addcat = () => {
     }
     if (isSuccess && updatedCategory) {
       toast.success("Category Updated Successfullly!");
-      navigate("/admin/list-category");
+      navigate("/admin/category");
     }
     if (isError) {
       toast.error("Something Went Wrong!");
     }
   }, [isSuccess, isError, isLoading]);
+  const createCategoryHandler = (e) => {
+    dispatch(createCategory(e));
+
+    // toast.success("Category Added Successfullly!");
+    setTimeout(() => {
+      dispatch(getCategories());
+    }, 100);
+  }
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -62,11 +79,13 @@ const Addcat = () => {
         dispatch(updateAProductCategory(data));
         dispatch(resetState());
       } else {
-        dispatch(createCategory(values));
+        // dispatch(createCategory(values));
+        createCategoryHandler(values)
         formik.resetForm();
         setTimeout(() => {
           dispatch(resetState());
-        }, 300);
+           dispatch(getCategories());
+        }, 100);
       }
     },
   });
@@ -96,6 +115,7 @@ const Addcat = () => {
           </button>
         </form>
       </div>
+      <Categorylist/>
     </div>
   );
 };

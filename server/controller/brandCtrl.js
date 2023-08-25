@@ -7,7 +7,9 @@ const createBrand = asyncHandler(async (req, res) => {
     const newBrand = await Brand.create(req.body);
     res.json(newBrand);
   } catch (error) {
-    throw new Error(error);
+    console.log(error);
+    throw new Error("Duplicate Brand");
+    
   }
 });
 const updateBrand = asyncHandler(async (req, res) => {

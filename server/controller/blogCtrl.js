@@ -16,15 +16,46 @@ const createBlog = asyncHandler(async (req, res) => {
 const updateBlog = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
+
   try {
-    const updateBlog = await Blog.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
-    res.json(updateBlog);
+    const blog = await Blog.findById(id);
+
+    if (blog.images && blog.images.length > 0) {
+      const newImagesToUpdate = req.body.images.filter(
+        (newImage) =>
+          !blog.images.some(
+            (existingImage) => existingImage.public_id === newImage.public_id
+          )
+      );
+      console.log("newImagesToUpdate", newImagesToUpdate);
+
+      const updatedImages = [...blog.images, ...newImagesToUpdate];
+
+      const updateBlog = await Blog.findByIdAndUpdate(
+        id,
+        { ...req.body, images: updatedImages },
+        { new: true }
+      );
+
+      console.log("blogupdxx", updateBlog);
+      res.json(updateBlog);
+    } else {
+      const updatedImages = [...req.body.images];
+
+      const updateBlog = await Blog.findByIdAndUpdate(
+        id,
+        { ...req.body, images: updatedImages },
+        { new: true }
+      );
+
+      console.log("blogupdxx22", updateBlog);
+      res.json(updateBlog);
+    }
   } catch (error) {
     throw new Error(error);
   }
 });
+
 
 const getBlog = asyncHandler(async (req, res) => {
   const { id } = req.params;

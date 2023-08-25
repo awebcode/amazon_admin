@@ -11,11 +11,16 @@ import {
 } from "../features/pcategory/pcategorySlice";
 import CustomModal from "../components/CustomModal";
 import { getMyDetails } from "../features/auth/authSlice";
+import { toast } from "react-toastify";
 
 const columns = [
   {
     title: "SNo",
     dataIndex: "key",
+  },
+  {
+    title: "Id",
+    dataIndex: "id",
   },
   {
     title: "Name",
@@ -52,13 +57,11 @@ const Categorylist = () => {
   for (let i = 0; i < pCatStat.length; i++) {
     data1.push({
       key: i + 1,
+      id: pCatStat[i]._id,
       name: pCatStat[i].title,
       action: (
         <>
-          <Link
-            to={`/admin/category/${pCatStat[i]._id}`}
-            className=" fs-3 text-danger"
-          >
+          <Link to={`/admin/category/${pCatStat[i]._id}`} className=" fs-3 text-danger">
             <BiEdit />
           </Link>
           <button
@@ -73,14 +76,18 @@ const Categorylist = () => {
   }
   const deleteCategory = (e) => {
     dispatch(deleteAProductCategory(e));
+   
+    toast.success("Category deleted")
+    // dispatch(getCategories());
     setOpen(false);
+    
     setTimeout(() => {
       dispatch(getCategories());
-    }, 100);
+    }, 200);
   };
   return (
     <div>
-      <h3 className="mb-4 title">Product Categories</h3>
+      <h3 className="mb-4 title">Product Categories({pCatStat && pCatStat.length})</h3>
       <div>
         <Table columns={columns} dataSource={data1} />
       </div>
@@ -88,7 +95,8 @@ const Categorylist = () => {
         hideModal={hideModal}
         open={open}
         performAction={() => {
-          deleteCategory(pCatId);
+          deleteCategory(pCatId && pCatId);
+          dispatch(getCategories());
         }}
         title="Are you sure you want to delete this Product Category?"
       />

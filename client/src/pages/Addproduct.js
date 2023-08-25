@@ -22,6 +22,9 @@ import {
   updateProducts,
 } from "../features/product/productSlice";
 import { getMyDetails } from "../features/auth/authSlice";
+import axios from "axios";
+import { config } from "../utils/axiosconfig";
+import { base_url } from "../utils/baseUrl";
 let schema = yup.object().shape({
   title: yup.string().required("Title is Required"),
   type: yup.string().required("Type is Required"),
@@ -47,7 +50,7 @@ const Addproduct = () => {
     if (id && id !== "undefined") {
       dispatch(getSingleProducts(id));
     }
-      dispatch(getMyDetails());
+    dispatch(getMyDetails());
 
     dispatch(getBrands());
     dispatch(getCategories());
@@ -110,98 +113,173 @@ const Addproduct = () => {
     isCreateError,
   ]);
   const coloropt = [];
-  colorState.forEach((i) => {
-    coloropt.push({
-      label: i.title,
-      value: i.title,
+  colorState &&
+    colorState.forEach((i) => {
+      coloropt.push({
+        label: i.title,
+        value: i.title,
+      });
     });
-  });
   //  console.log("colorpt", coloropt);
 
-  const img = [];
-  imgState.forEach((i) => {
-    img.push({
+  // Combine existing and uploaded images
+  const [img, setImg] = useState([]);
+
+  useEffect(() => {
+    const newImages = imgState.map((i) => ({
       public_id: i.public_id,
       url: i.url,
-    });
-  });
+    }));
+
+    setImg((prevImages) => [...prevImages, ...newImages]);
+  }, [imgState]); // Use imgState instead of img
+
+  // Update formik values when images change
+  useEffect(() => {
+    formik.values.images = img;
+  }, [img]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [Type, setType] = useState("");
+  const [Brand, setBrand] = useState("");
+  const [Sort, setSort] = useState("");
+  const [Stock, setStock] = useState(0);
+  const [Slug, setSlug] = useState("");
+  const [Tags, setTagss] = useState([]);
+  const [Price, setPrice] = useState(0);
+  const [Category, setCategory] = useState("");
+
   useEffect(() => {
     // Set initial form values when product data is available
     if (id && productState) {
       formik.setValues({
         id: productState._id,
-        title: productState.title,
-        type: productState?.type,
-        sort: productState?.sort,
-        stock: productState?.stock,
-        slug: productState?.slug,
-        tags: productState?.tags,
-        description: productState.description,
-        price: productState.price,
-        brand: productState.brand,
-        category: productState.category,
 
-        color: productState.color?.length > 0 ? productState.color?.map((c) => c) : [],
+        // title: productState.title,
+        // type: productState?.type,
+        // sort: productState?.sort,
+        // stock: productState?.stock,
+        // slug: productState?.slug,
+        // tags: productState?.tags,
+        // description: productState?.description,
+        // price: productState?.price,
+        // brand: productState?.brand,
+        // category: productState?.category,
 
-        images: productState.images,
+        color:
+          productState && productState.color?.length > 0
+            ? productState.color?.map((c) => c)
+            : [],
+
+        // images: productState.images,
       });
-
+      // setPrice(productState?.price);
+      // setStock(productState?.stock);
       setImages(productState.images);
       setTags(productState?.tags);
     }
-  }, [id, productState, dispatch, color]);
+  }, [id, productState, dispatch, color, productState.images]);
 
   useEffect(() => {
-    formik.values.color = color || [];
-    formik.values.images = img;
-  }, [color, img]);
+    formik.values.color = color;
+   
+  }, [color]);
+  //tags
+
+  const [inputValue, setInputValue] = useState("");
+  const [inputVisible, setInputVisible] = useState(false);
+
+  const handleClose = (tagToRemove) => {
+    const updatedTags = tags && tags.filter((tag) => tag !== tagToRemove);
+    setTags(updatedTags);
+    formik.setFieldValue("tags", [...updatedTags]);
+  };
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleInputConfirm = () => {
+    if (inputValue && tags && !tags.includes(inputValue)) {
+      setTags([...tags, inputValue]);
+      formik.setValues({
+        tags: [...tags, inputValue],
+      }); // Use the callback version
+
+      // Clear input after setting field value
+      setInputValue("");
+      setInputVisible(false);
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
-      id: id,
-      title: "",
-      description: "",
-      type: "",
-      sort: "",
-      stock: "",
-      slug: "",
-      tags: "",
-      price: "",
-      brand: "",
-      category: "",
+      id: id !== undefined ? productState?._id : "",
+      title: id !== undefined ? productState?.title : "",
+      description: id !== undefined ? productState?.description : "",
+      type: id !== undefined ? productState?.type : "",
+      sort: id !== undefined ? productState?.sort : "",
+      stock: id !== undefined ? productState?.stock : "",
+      slug: id !== undefined ? productState?.slug : "",
+      tags: [],
+      price: id !== undefined ? productState?.price : "",
+      brand: id !== undefined ? productState?.brand : "",
+      category: id !== undefined ? productState?.category : "",
 
       color: [],
 
       images: [],
     },
-    validationSchema: schema,
+
+    validationSchema: !id && schema,
     onSubmit: (values) => {
-      if (id) {
-        const updatedImages = [...productState.images, ...values.images].filter(
-          (image) => !removedImages.includes(image.public_id)
+      if (id !== undefined) {
+        const updatedImages = [...images, ...img];
+        const finalImages = updatedImages.filter(
+          (img) =>
+            !removedImages.some((removedImg) => removedImg.public_id === img.public_id)
         );
 
-        const updatedColors = [...values.color]; // Fixed typo here
-
+        const updatedColors = [...color]; // Fixed typo here
+        
         const updatedValues = {
           ...values,
-          color: updatedColors.map((c) => c), // Extract _id values for color
-          images: updatedImages,
-        };
 
+          title: title ? title : formik.values.title,
+          type: Type ? Type : formik.values.type,
+          sort: Sort ? Sort : formik.values.sort,
+          stock: Stock ? Stock : formik.values.stock,
+          slug: Slug ? Slug : formik.values.slug,
+          description: description ? description : formik.values.description,
+          price: Price ? Price : formik.values.price,
+          brand: Brand ? Brand : formik.values.brand,
+          category: Category ? Category : formik.values.category,
+          color: updatedColors && updatedColors?.map((c) => c), // Extract _id values for color
+          images: finalImages,
+        };
+        //  console.log(updatedValues);
         dispatch(updateProducts(updatedValues));
-        formik.setFieldValue("images", [...productState.images]);
-         
-         formik.resetForm();
-         dispatch(resetState());
+        // formik.setFieldValue("images", [...productState.images]);
+
+        formik.resetForm();
+        setTimeout(() => {
+          formik.resetForm();
+
+          dispatch(resetState());
           dispatch(getProducts());
+          formik.resetForm();
+        }, 300);
       } else {
         dispatch(createProducts(values));
-         formik.setFieldValue("images", []);
+        // formik.setFieldValue("images", []);
         formik.resetForm();
-         
-       dispatch(resetState());
-       dispatch(getProducts());
-        
+        setTimeout(() => {
+          formik.resetForm();
+
+          dispatch(resetState());
+          dispatch(getProducts());
+          formik.resetForm();
+        }, 300);
       }
     },
   });
@@ -211,12 +289,45 @@ const Addproduct = () => {
   };
   // Add a state variable to keep track of removed images
   const [removedImages, setRemovedImages] = useState([]);
+  // Handle image removal
+  const deleteImageFromCloudinary = async (public_id) => {
+    try {
+      const { data } = await axios.delete(
+        `${base_url}upload/delete-img/products/${public_id}`,
+        config
+      );
+      if (data?.success) {
+        dispatch(resetState());
+      } // Assuming your API returns a message
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    }
+  };
 
-  // Inside your removeImg function
-  const removeImg = (id) => {
-    const updatedImages = images.filter((image) => image.public_id !== id);
-    setImages(updatedImages); // Update the images in state
-    setRemovedImages([...removedImages, id]); // Add the removed image ID to removedImages state
+  const handleRemoveImages = async (public_id) => {
+    // Dispatch the action to delete the image from Cloudinary
+    await deleteImageFromCloudinary(public_id);
+
+    // Filter out the removed image
+    const updatedImages = img.filter((img) => img.public_id !== public_id);
+
+    // Update the state with the updated images array
+    setImg(updatedImages);
+    setImages(updatedImages);
+    // Update the removedImages state to keep track of removed images
+    setRemovedImages((prevRemovedImages) => [
+      ...prevRemovedImages,
+      img.find((img) => img.public_id === public_id),
+    ]);
+    dispatch(getSingleProducts(id));
+  };
+  // Handle image removal
+  const handleRemoveImg = (public_id) => {
+    dispatch(delImg(public_id));
+    const updatedImages = img.filter((img) => img.public_id !== public_id);
+    const removedImage = img.find((img) => img.public_id === public_id);
+    setImg(updatedImages);
+    setRemovedImages([...removedImages, removedImage]);
   };
   const tagRender = (props) => {
     const { label, value, closable, onClose, title } = props;
@@ -237,163 +348,226 @@ const Addproduct = () => {
       </Tag>
     );
   };
-  //tags
-
-  const [inputValue, setInputValue] = useState("");
-  const [inputVisible, setInputVisible] = useState(false);
-
-  const handleClose = (tagToRemove) => {
-    const updatedTags = tags.filter((tag) => tag !== tagToRemove);
-    setTags(updatedTags);
-  };
-
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-  };
-
-  const handleInputConfirm = () => {
-    if (inputValue && !tags.includes(inputValue)) {
-      setTags([...tags, inputValue]);
-      formik.setFieldValue("tags", [...tags, inputValue]);
-    }
-    setInputValue("");
-    setInputVisible(false);
-  };
 
   return (
     <div>
       <h3 className="mb-4 title">{id && id ? "Update Product" : "Add Product"}</h3>
+      {Object.keys(formik.errors).length > 0 && (
+        <div className="error">
+          {Object.values(formik.errors).map((error, index) => (
+            <p key={index}>{error}</p>
+          ))}
+        </div>
+      )}
+
       <div>
         <form onSubmit={formik.handleSubmit} className="d-flex gap-3 flex-column">
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Title
+          </div>
           <CustomInput
             type="text"
             label="Enter Product Title"
             name="title"
             onChng={formik.handleChange("title")}
+            onChng2={setTitle}
             onBlr={formik.handleBlur("title")}
             val={formik.values.title || (productState && productState.title)}
           />
-          <div className="error">{formik.touched.title && formik.errors.title}</div>
-
+          {formik.errors.title && (
+            <div className="error">{formik.touched.title && formik.errors.title}</div>
+          )}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Slug
+          </div>
           <CustomInput
             type="text"
             label="Enter Unique Product slug"
             name="slug"
             onChng={formik.handleChange("slug")}
-            onBlr={formik.handleBlur("slug")}
+            onChng2={setSlug}
+            // onBlr={formik.handleBlur("slug")}
             val={formik.values.slug || (productState && productState.slug)}
           />
-          <div className="error">{formik.touched.slug && formik.errors.slug}</div>
-
+          {formik.errors.slug && (
+            <div className="error">{formik.touched.slug && formik.errors.slug}</div>
+          )}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Description
+          </div>
           <div className="">
             <ReactQuill
               theme="snow"
               name="description"
-              onChange={formik.handleChange("description")}
-              value={formik.values.description}
+              onChange={(value) => {
+                formik.handleChange("description")(value); // Call Formik's handleChange with the value
+                setDescription(value); // Update local state with the value
+              }}
+              value={
+                formik.values.description || (productState && productState.description)
+              }
             />
           </div>
-          <div className="error">
-            {formik.touched.description && formik.errors.description}
-          </div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "5px",
-              flexWrap: "wrap",
-            }}
-          >
-            {tags &&
-              tags.map((tag) => (
-                <Tag key={tag} closable onClose={() => handleClose(tag)}>
-                  {tag}
-                </Tag>
-              ))}
-            {inputVisible && (
-              <Input
-                type="text"
-                size="small"
-                // style={{ width: 18 }}
-                className="form-control"
-                value={inputValue}
-                onChange={handleInputChange}
-                onBlur={handleInputConfirm}
-                onPressEnter={handleInputConfirm}
-              />
-            )}
-
-            <Tag
-              onClick={() => setInputVisible(true)}
-              style={{ background: "#fff", borderStyle: "dashed" }}
+          {formik.errors.description && (
+            <div className="error">
+              {formik.touched.description && formik.errors.description}
+            </div>
+          )}
+          {!id && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "5px",
+                flexWrap: "wrap",
+              }}
             >
-              + Add Product Tag
-            </Tag>
-          </div>
+              <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+                Set Tags
+              </div>
+
+              {tags &&
+                tags?.map((tag) => (
+                  <Tag key={tag} closable onClose={() => handleClose(tag)}>
+                    {tag}
+                  </Tag>
+                ))}
+              {inputVisible && (
+                <Input
+                  type="text"
+                  size="small"
+                  // style={{ width: 18 }}
+                  className="form-control"
+                  value={inputValue}
+                  onChange={handleInputChange}
+                  onBlur={handleInputConfirm}
+                  onPressEnter={handleInputConfirm}
+                />
+              )}
+
+              <Tag
+                onClick={() => setInputVisible(true)}
+                style={{ background: "#fff", borderStyle: "dashed" }}
+              >
+                + Add Product Tag
+              </Tag>
+            </div>
+          )}
           {/* <div className="error">{formik.touched.tags && formik.errors.tags}</div> */}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Set Price
+          </div>
           <CustomInput
             type="number"
             label="Enter Product Price"
             name="price"
             onChng={formik.handleChange("price")}
+            onChng2={setPrice}
             onBlr={formik.handleBlur("price")}
-            val={formik.values.price}
+            val={formik.values.price || (productState && productState.price)}
           />
-          <div className="error">{formik.touched.price && formik.errors.price}</div>
+          {formik.errors.price && (
+            <div className="error">{formik.touched.price && formik.errors.price}</div>
+          )}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Set Stock
+          </div>
           <CustomInput
             type="number"
             label="Enter Product Stock"
             name="stock"
             onChng={formik.handleChange("stock")}
+            onChng2={setStock}
             onBlr={formik.handleBlur("stock")}
-            val={formik.values.stock}
+            val={formik.values.stock || (productState && productState.stock)}
           />
-          <div className="error">{formik.touched.stock && formik.errors.stock}</div>
+          {formik.errors.stock && (
+            <div className="error">{formik.touched.stock && formik.errors.stock}</div>
+          )}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Select Brand
+          </div>
           <select
             name="brand"
-            onChange={formik.handleChange("brand")}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              formik.handleChange("brand")(selectedValue); // Call Formik's handleChange with the selected value
+              setBrand(selectedValue); // Update local state with the selected value
+            }}
             onBlur={formik.handleBlur("brand")}
-            value={formik.values.brand}
+            value={formik.values.brand || (productState && productState.brand)}
             className="form-control py-3 mb-3"
             id=""
           >
             <option value="">Select Brand</option>
-            {brandState.map((i, j) => {
-              return (
-                <option key={j} value={i.title}>
-                  {i.title}
-                </option>
-              );
-            })}
+            {brandState &&
+              brandState.map((i, j) => {
+                return (
+                  <option key={j} value={i.title}>
+                    {i.title}
+                  </option>
+                );
+              })}
           </select>
-          <div className="error">{formik.touched.brand && formik.errors.brand}</div>
+          {formik.errors.brand && (
+            <div className="error">{formik.touched.brand && formik.errors.brand}</div>
+          )}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Select Brand
+          </div>
           <select
             name="category"
-            onChange={formik.handleChange("category")}
+            onChange={(e) => {
+              const selectedValue = e.target.value;
+              formik.handleChange("category")(selectedValue);
+              setCategory(selectedValue);
+            }}
             onBlur={formik.handleBlur("category")}
-            value={formik.values.category}
+            value={formik.values.category || (productState && productState.category)}
             className="form-control py-3 mb-3"
             id=""
           >
             <option value="">Select Category</option>
-            {catState.map((mainCategory, index) => (
-              <optgroup key={index} label={mainCategory.title}>
-                {mainCategory.subcategories.map((subcategory, subIndex) => (
-                  <option key={subIndex} value={subcategory} style={{ color: "#000" }}>
-                    {subcategory}
+            {catState &&
+              catState.map((mainCategory, index) => (
+                <optgroup key={index} label={mainCategory.title}>
+                  {/* Main Category Option */}
+                  <option value={`${mainCategory.title}`} style={{ color: "#06b6d4" }}>
+                    {mainCategory.title}
                   </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-          <div className="error">{formik.touched.category && formik.errors.category}</div>
 
+                  {/* Subcategory Options */}
+                  {mainCategory.subcategories &&
+                    mainCategory.subcategories.map((subcategory, subIndex) => (
+                      <option
+                        key={subIndex}
+                        value={`${subcategory}`}
+                        style={{ color: "#475569" }}
+                      >
+                        {subcategory}
+                      </option>
+                    ))}
+                </optgroup>
+              ))}
+          </select>
+
+          {formik.touched.category && (
+            <div className="error">
+              {formik.touched.category && formik.errors.category}
+            </div>
+          )}
           {/* <div className="error">{formik.touched.category && formik.errors.category}</div> */}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Select Type
+          </div>
           <select
             name="type"
-            onChange={formik.handleChange("type")}
-            onBlur={formik.handleBlur("type")}
-            value={formik.values.type}
+            onChange={(value) => {
+              formik.handleChange("type")(value);
+              setType(value.target.value);
+            }}
+            // onBlur={formik.handleBlur("type")}
+            value={formik.values.type || (productState && productState.type)}
             className="form-control py-3 mb-3"
             id=""
           >
@@ -404,12 +578,21 @@ const Addproduct = () => {
             <option value="Public">Public</option>
             <option value="Public Business">Public Business</option>
           </select>
-          <div className="error">{formik.touched.type && formik.errors.type}</div>
+
+          {formik.errors.type && (
+            <div className="error">{formik.touched.type && formik.errors.type}</div>
+          )}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Select SortType
+          </div>
           <select
             name="sort"
-            onChange={formik.handleChange("sort")}
-            onBlur={formik.handleBlur("sort")}
-            value={formik.values.sort}
+            onChange={(value) => {
+              formik.handleChange("sort")(value.target.value);
+              setSort(value.target.value);
+            }}
+            // onBlur={formik.handleBlur("sort")}
+            value={formik.values.sort || (productState && productState.sort)}
             className="form-control py-3 mb-3"
             id=""
           >
@@ -422,32 +605,31 @@ const Addproduct = () => {
             <option value="Special">Special</option>
             <option value="Best">Best</option>
           </select>
-          <div className="error">{formik.touched.sort && formik.errors.sort}</div>
-          {console.log("colorformik", formik.values.color)}
+          {formik.errors.sort && (
+            <div className="error">{formik.touched.sort && formik.errors.sort}</div>
+          )}
+          {/* {console.log("colorformik", formik.values.color)} */}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Select Colors
+          </div>
           <Select
             mode="multiple"
             allowClear
             tagRender={tagRender}
             className="w-100"
             placeholder="Select colors"
-            // value={
-            //   formik.values.color.map((x) => {
-            //     return {
-            //       label: x,
-            //     };
-            //   }) ||
-            //   (productState &&
-            //     productState.color.map((v) => {
-            //       return {
-            //         label: v,
-            //       };
-            //     }))
-            // }
             onChange={(i) => handleColors(i)}
+            
+            defaultValue={coloropt}
             options={coloropt}
+           
           />
-          <div className="error">{formik.touched.color && formik.errors.color}</div>
-
+          {formik.errors.color && (
+            <div className="error">{formik.touched.color && formik.errors.color}</div>
+          )}
+          <div className="error" style={{ fontSize: "15px", color: "Highlight" }}>
+            Select Images
+          </div>
           <div className="bg-white border-1 p-5 text-center">
             {imgUloading ? (
               <PacmanLoader color="#36d7b7" />
@@ -473,7 +655,7 @@ const Addproduct = () => {
                   <div className=" position-relative" key={j}>
                     <button
                       type="button"
-                      onClick={() => dispatch(delImg(i.public_id))}
+                      onClick={() => handleRemoveImg(i.public_id)}
                       className="btn-close position-absolute"
                       style={{ top: "10px", right: "10px" }}
                     ></button>
@@ -487,7 +669,7 @@ const Addproduct = () => {
                   <div className=" position-relative" key={j}>
                     <button
                       type="button"
-                      onClick={() => removeImg(i.public_id)}
+                      onClick={() => handleRemoveImages(i.public_id)}
                       className="btn-close position-absolute"
                       style={{ top: "10px", right: "10px" }}
                     ></button>

@@ -19,6 +19,7 @@ const createProduct = async (product) => {
   return response.data;
 };
 const updateProduct = async (product) => {
+  console.log("slice",product)
   const response = await axios.put(
     `${base_url}product/${product.id}`,
     product,

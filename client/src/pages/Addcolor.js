@@ -8,10 +8,12 @@ import { useFormik } from "formik";
 import {
   createColor,
   getAColor,
+  getColors,
   resetState,
   updateAColor,
 } from "../features/color/colorSlice";
 import { getMyDetails } from "../features/auth/authSlice";
+import Colorlist from "./Colotlist";
 let schema = yup.object().shape({
   title: yup.string().required("Color is Required"),
 });
@@ -30,10 +32,12 @@ const Addcolor = () => {
     colorName,
   } = newColor;
   useEffect(() => {
-      dispatch(getMyDetails());
+    dispatch(getMyDetails());
+    dispatch(getColors());
 
     if (getColorId !== undefined) {
       dispatch(getAColor(getColorId));
+      dispatch(getColors());
     } else {
       dispatch(resetState());
     }
@@ -44,7 +48,7 @@ const Addcolor = () => {
     }
     if (isSuccess && updatedColor) {
       toast.success("Color Updated Successfullly!");
-      navigate("/admin/list-color");
+      navigate("/admin/color");
     }
     if (isError) {
       toast.error("Something Went Wrong!");
@@ -96,6 +100,7 @@ const Addcolor = () => {
           </button>
         </form>
       </div>
+      <Colorlist/>
     </div>
   );
 };

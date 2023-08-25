@@ -71,11 +71,11 @@ const Productlist = () => {
     dispatch(getMyDetails())
     setIsloading(true);
     dispatch(getProducts());
-    setTimeout(() => {
+    // setTimeout(() => {
 
-      setIsloading(false)
-    }, 1000);
-    
+    //   setIsloading(false)
+    // }, 100);
+     setIsloading(false);
     // setIsloading(false)
   }, [dispatch,isLoading]);
    

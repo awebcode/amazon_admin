@@ -14,6 +14,10 @@ const columns = [
     dataIndex: "key",
   },
   {
+    title: "Id",
+    dataIndex: "id",
+  },
+  {
     title: "Name",
     dataIndex: "name",
   },
@@ -45,13 +49,11 @@ const Colorlist = () => {
   for (let i = 0; i < colorState.length; i++) {
     data1.push({
       key: i + 1,
+      id: colorState[i]._id,
       name: colorState[i].title,
       action: (
         <>
-          <Link
-            to={`/admin/color/${colorState[i]._id}`}
-            className=" fs-3 text-danger"
-          >
+          <Link to={`/admin/color/${colorState[i]._id}`} className=" fs-3 text-danger">
             <BiEdit />
           </Link>
           <button

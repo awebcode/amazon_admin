@@ -9,7 +9,9 @@ var prodcategorySchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+    subcategories:Array
   },
+
   {
     timestamps: true,
   }

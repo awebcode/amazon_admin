@@ -11,6 +11,7 @@ import {
 } from "../features/bcategory/bcategorySlice";
 import CustomModal from "../components/CustomModal";
 import { getMyDetails } from "../features/auth/authSlice";
+import { toast } from "react-toastify";
 
 const columns = [
   {
@@ -48,7 +49,7 @@ const Blogcatlist = () => {
     dispatch(getCategories());
   }, [dispatch]);
   const bCatState = useSelector((state) => state.bCategory.bCategories);
-  console.log(bCatState);
+  // console.log(bCatState);
   const data1 = [];
   for (let i = 0; i < bCatState.length; i++) {
     data1.push({
@@ -74,10 +75,11 @@ const Blogcatlist = () => {
   }
   const deleteBlogCategory = (e) => {
     dispatch(deleteABlogCat(e));
+    toast.success("Blog Category deleted success")
     setOpen(false);
     setTimeout(() => {
       dispatch(getCategories());
-    }, 100);
+    }, 300);
   };
   return (
     <div>
@@ -90,6 +92,7 @@ const Blogcatlist = () => {
         open={open}
         performAction={() => {
           deleteBlogCategory(blogCatId);
+          dispatch(getCategories());
         }}
         title="Are you sure you want to delete this blog category?"
       />

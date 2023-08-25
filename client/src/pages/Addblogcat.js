@@ -8,10 +8,12 @@ import { useFormik } from "formik";
 import {
   createNewblogCat,
   getABlogCat,
+  getCategories,
   resetState,
   updateABlogCat,
 } from "../features/bcategory/bcategorySlice";
 import { getMyDetails } from "../features/auth/authSlice";
+import Blogcatlist from "./Blogcatlist";
 let schema = yup.object().shape({
   title: yup.string().required("Category Name is Required"),
 });
@@ -31,9 +33,10 @@ const Addblogcat = () => {
   } = newBlogCategory;
   useEffect(() => {
       dispatch(getMyDetails());
-
+dispatch(getCategories());
     if (getBlogCatId !== undefined) {
       dispatch(getABlogCat(getBlogCatId));
+      dispatch(getCategories());
     } else {
       dispatch(resetState());
     }
@@ -44,7 +47,7 @@ const Addblogcat = () => {
     }
     if (isSuccess && updatedBlogCategory) {
       toast.success("Blog Category Updated Successfullly!");
-      navigate("/admin/blog-category-list");
+      navigate("/admin/blog-category");
     }
     if (isError) {
       toast.error("Something Went Wrong!");
@@ -66,6 +69,7 @@ const Addblogcat = () => {
         formik.resetForm();
         setTimeout(() => {
           dispatch(resetState());
+          dispatch(getCategories());
         }, 300);
       }
     },
@@ -97,6 +101,7 @@ const Addblogcat = () => {
           </button>
         </form>
       </div>
+      <Blogcatlist/>
     </div>
   );
 };

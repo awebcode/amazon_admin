@@ -45,7 +45,7 @@ const MainLayout = () => {
   }, [dispatch])
   
   const logoutHandler = () => {
-    dispatch(logout())
+     dispatch(logout())
      navigate("/");
      
   }
@@ -131,31 +131,31 @@ const MainLayout = () => {
                   icon: <SiBrandfolder className="fs-4" />,
                   label: "Brand",
                 },
-                {
-                  key: "list-brand",
-                  icon: <SiBrandfolder className="fs-4" />,
-                  label: "Brand List ",
-                },
+                // {
+                //   key: "list-brand",
+                //   icon: <SiBrandfolder className="fs-4" />,
+                //   label: "Brand List ",
+                // },
                 {
                   key: "category",
                   icon: <BiCategoryAlt className="fs-4" />,
                   label: "Category",
                 },
-                {
-                  key: "list-category",
-                  icon: <BiCategoryAlt className="fs-4" />,
-                  label: "Category List",
-                },
+                // {
+                //   key: "list-category",
+                //   icon: <BiCategoryAlt className="fs-4" />,
+                //   label: "Category List",
+                // },
                 {
                   key: "color",
                   icon: <AiOutlineBgColors className="fs-4" />,
                   label: "Color",
                 },
-                {
-                  key: "list-color",
-                  icon: <AiOutlineBgColors className="fs-4" />,
-                  label: "Color List",
-                },
+                // {
+                //   key: "list-color",
+                //   icon: <AiOutlineBgColors className="fs-4" />,
+                //   label: "Color List",
+                // },
               ],
             },
             {
@@ -173,11 +173,11 @@ const MainLayout = () => {
                   icon: <ImBlog className="fs-4" />,
                   label: "Add Coupon",
                 },
-                {
-                  key: "coupon-list",
-                  icon: <RiCouponLine className="fs-4" />,
-                  label: "Coupon List",
-                },
+                // {
+                //   key: "coupon-list",
+                //   icon: <RiCouponLine className="fs-4" />,
+                //   label: "Coupon List",
+                // },
               ],
             },
             {
@@ -190,21 +190,21 @@ const MainLayout = () => {
                   icon: <ImBlog className="fs-4" />,
                   label: "Add Blog",
                 },
-                {
-                  key: "blog-list",
-                  icon: <FaBloggerB className="fs-4" />,
-                  label: "Blog List",
-                },
+                // {
+                //   key: "blog-list",
+                //   icon: <FaBloggerB className="fs-4" />,
+                //   label: "Blog List",
+                // },
                 {
                   key: "blog-category",
                   icon: <ImBlog className="fs-4" />,
                   label: "Add Blog Category",
                 },
-                {
-                  key: "blog-category-list",
-                  icon: <FaBloggerB className="fs-4" />,
-                  label: "Blog Category List",
-                },
+                // {
+                //   key: "blog-category-list",
+                //   icon: <FaBloggerB className="fs-4" />,
+                //   label: "Blog Category List",
+                // },
               ],
             },
             {

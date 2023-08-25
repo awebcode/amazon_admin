@@ -13,6 +13,7 @@ const createCategory = asyncHandler(async (req, res) => {
 const updateCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   validateMongoDbId(id);
+  console.log(req.body)
   try {
     const updatedCategory = await Category.findByIdAndUpdate(id, req.body, {
       new: true,
@@ -44,7 +45,7 @@ const getCategory = asyncHandler(async (req, res) => {
 });
 const getallCategory = asyncHandler(async (req, res) => {
   try {
-    const getallCategory = await Category.find();
+    const getallCategory = await Category.find(); //.sort("-createdAt")
     res.json(getallCategory);
     // console.log("category",getallCategory)
   } catch (error) {

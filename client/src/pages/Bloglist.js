@@ -77,11 +77,11 @@ const Bloglist = () => {
     setOpen(false);
     setTimeout(() => {
       dispatch(getBlogs());
-    }, 100);
+    }, 300);
   };
   return (
     <div>
-      <h3 className="mb-4 title">Blogs List</h3>
+      <h3 className="mb-4 title">Blogs List({getBlogState && getBlogState.length})</h3>
       <div>
         <Table columns={columns} dataSource={data1} />
       </div>
@@ -89,7 +89,8 @@ const Bloglist = () => {
         hideModal={hideModal}
         open={open}
         performAction={() => {
-          deleteBlog(blogId);
+           deleteBlog(blogId && blogId);
+           dispatch(getBlogs());
         }}
         title="Are you sure you want to delete this blog?"
       />

@@ -8,10 +8,12 @@ import { useFormik } from "formik";
 import {
   createCoupon,
   getACoupon,
+  getAllCoupon,
   resetState,
   updateACoupon,
 } from "../features/coupon/couponSlice";
 import { getMyDetails } from "../features/auth/authSlice";
+import Couponlist from "./Couponlist";
 
 let schema = yup.object().shape({
   name: yup.string().required("Coupon Name is Required"),
@@ -22,8 +24,10 @@ const AddCoupon = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+ 
   const getCouponId = location.pathname.split("/")[3];
   const newCoupon = useSelector((state) => state.coupon);
+  const [isUpdateMode, setIsUpdateMode] = useState(getCouponId !== undefined);
 
   const {
     isSuccess,
@@ -40,16 +44,22 @@ const AddCoupon = () => {
     const [month, day, year] = newDate.split("/");
     return [year, month, day].join("-");
   };
-
   useEffect(() => {
-      dispatch(getMyDetails());
+  dispatch(getAllCoupon());
+},[dispatch])
+ useEffect(() => {
+   dispatch(getMyDetails());
 
-    if (getCouponId !== undefined) {
-      dispatch(getACoupon(getCouponId));
-    } else {
-      dispatch(resetState());
-    }
-  }, [dispatch,getCouponId]);
+   if (getCouponId !== undefined) {
+     setIsUpdateMode(true); // Set to update mode
+     dispatch(getACoupon(getCouponId));
+     dispatch(getAllCoupon());
+   } else {
+     setIsUpdateMode(false); // Set to creation mode
+    //  dispatch(resetState());
+   }
+ }, [dispatch, getCouponId]);
+
 
   useEffect(() => {
     if (isSuccess && createdCoupon) {
@@ -57,30 +67,53 @@ const AddCoupon = () => {
     }
     if (isSuccess && updatedCoupon) {
       toast.success("Coupon Updated Successfullly!");
-      navigate("/admin/coupon-list");
+      navigate("/admin/coupon");
     }
     if (isError && couponName && couponDiscount && couponExpiry) {
-      toast.error("Something Went Wrong!");
+      toast.error("Copied Coupon Found");
     }
   }, [isSuccess, isError, isLoading]);
+  const createCouponHandler = (e) => {
+    dispatch(createCoupon(e));
+
+   
+    setTimeout(() => {
+      dispatch(getAllCoupon());
+    }, 100);
+  };
+  const updateCouponHandler = (e, resetForm) => {
+     dispatch(updateACoupon(e));
+     
+     toast.success("Coupon updated successfully!");
+     navigate("/admin/coupon");
+  
+    setTimeout(() => {
+      dispatch(getAllCoupon());
+     
+       resetForm();
+    }, 100);
+  };
   const formik = useFormik({
-    enableReinitialize: true,
+    enableReinitialize: isUpdateMode,
     initialValues: {
       name: couponName || "",
       expiry: changeDateFormet(couponExpiry) || "",
       discount: couponDiscount || "",
     },
     validationSchema: schema,
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       if (getCouponId !== undefined) {
         const data = { id: getCouponId, couponData: values };
-        dispatch(updateACoupon(data));
-        dispatch(resetState());
+       
+        updateCouponHandler(data,resetForm);
       } else {
-        dispatch(createCoupon(values));
+        // dispatch(createCoupon(values));
+        formik.resetForm();
+        createCouponHandler(values);
+
         formik.resetForm();
         setTimeout(() => {
-          dispatch(resetState);
+          dispatch(resetState());
         }, 300);
       }
     },
@@ -137,6 +170,7 @@ const AddCoupon = () => {
           </button>
         </form>
       </div>
+      <Couponlist/>
     </div>
   );
 };

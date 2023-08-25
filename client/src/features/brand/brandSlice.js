@@ -61,6 +61,8 @@ const initialState = {
   isLoading: false,
   isSuccess: false,
   message: "",
+  createdBrand: false,
+  updateABrand:false
 };
 export const brandSlice = createSlice({
   name: "brands",
@@ -96,7 +98,9 @@ export const brandSlice = createSlice({
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;
-        state.message = action.error;
+        state.createMessage = action.payload?.response?.data?.message;
+        //  console.log(state, action.payload?.response?.data?.message);
+      
       })
       .addCase(getABrand.pending, (state) => {
         state.isLoading = true;
@@ -120,7 +124,7 @@ export const brandSlice = createSlice({
         state.isLoading = false;
         state.isError = false;
         state.isSuccess = true;
-        state.updatedBrand = action.payload;
+        state.updateABrand = action.payload;
       })
       .addCase(updateABrand.rejected, (state, action) => {
         state.isLoading = false;

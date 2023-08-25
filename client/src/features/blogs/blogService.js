@@ -13,6 +13,7 @@ const createBlog = async (blog) => {
   return response.data;
 };
 const updateBlog = async (blog) => {
+  console.log("slice",blog)
   const response = await axios.put(
     `${base_url}blog/${blog.id}`,
     {

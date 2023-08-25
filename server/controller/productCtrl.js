@@ -19,23 +19,48 @@ const createProduct = asyncHandler(async (req, res) => {
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
-  const {id} = req.params;
-   validateMongoDbId(id);
-  console.log(id)
+  const { id } = req.params;
+  validateMongoDbId(id);
+  console.log(req.body);
+
   try {
     if (req.body.title) {
       req.body.slug = slugify(req.body.title);
     }
-    const updateProduct = await Product.findOneAndUpdate({ _id:id }, req.body, {
-      new: true,
-    });
-    console.log(updateProduct);
-    res.json(updateProduct);
-    
+    const product = await Product.findById(id);
+
+    if (product.images && product.images.length > 0) {
+      const newImagesToUpdate = req.body.images.filter(
+        (newImage) =>
+          !product.images.some(
+            (existingImage) => existingImage.public_id === newImage.public_id
+          )
+      );
+
+      const updatedImages = [...product.images, ...newImagesToUpdate];
+
+      const updateProduct = await Product.findByIdAndUpdate(
+        id,
+        { ...req.body, images: updatedImages },
+        { new: true, runValidators: true }
+      );
+
+      res.json(updateProduct);
+    } else {
+      const updateProduct = await Product.findByIdAndUpdate(
+        id,
+        { ...req.body },
+        { new: true, runValidators: true }
+      );
+
+      res.json(updateProduct);
+    }
   } catch (error) {
     throw new Error(error);
   }
 });
+
+
 
 const deleteProduct = asyncHandler(async (req, res) => {
   const {id} = req.params;

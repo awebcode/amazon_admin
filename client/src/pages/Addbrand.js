@@ -30,7 +30,8 @@ const Addbrand = () => {
     isLoading,
     createdBrand,
     brandName,
-    updatedBrand,
+    updateABrand:updateBrand,
+    createMessage,
   } = newBrand;
   useEffect(() => {
      dispatch(getMyDetails());
@@ -39,24 +40,26 @@ const Addbrand = () => {
      
       dispatch(getABrand(getBrandId));
     } else {
-      dispatch(resetState());
+      // dispatch(resetState());
     }
   }, [dispatch,getBrandId]);
 
   useEffect(() => {
     if (isSuccess && createdBrand) {
       toast.success("Brand Added Successfullly!");
-       dispatch(getBrands());
+      //  dispatch(resetState())
     }
-    if (isSuccess && updatedBrand) {
+    if (isSuccess && updateBrand) {
       toast.success("Brand Updated Successfullly!");
-      navigate("/admin/list-brand");
+       navigate("/admin/brand");
     }
 
-    if (isError) {
-      toast.error("Something Went Wrong!");
+    if (createMessage) {
+      toast.error(createMessage);
+      
     }
-  }, [isSuccess, isError, isLoading,dispatch]);
+    // dispatch(getBrands());
+  }, [isSuccess, createMessage, isLoading,dispatch,updateBrand]);
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -67,12 +70,14 @@ const Addbrand = () => {
       if (getBrandId !== undefined) {
         const data = { id: getBrandId, brandData: values };
         dispatch(updateABrand(data));
-        dispatch(resetState());
+        // dispatch(resetState());
+          formik.resetForm();
       } else {
         dispatch(createBrand(values));
         formik.resetForm();
         setTimeout(() => {
           dispatch(resetState());
+          dispatch(getBrands())
         }, 300);
       }
     },
