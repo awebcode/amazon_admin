@@ -33,7 +33,12 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 app.use(
   cors({
-    origin: "https://adminamazon.vercel.app", //http://localhost:3000//https://adminamazon.vercel.app
+    origin: [
+      "https://adminamazon.vercel.app",
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://amazonecommerceapp.vercel.app",
+    ], //http://localhost:3000//https://adminamazon.vercel.app
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     allowedHeaders: "Content-Type,Authorization",
