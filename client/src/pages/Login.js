@@ -1,121 +1,128 @@
-import React, { useEffect, useState } from "react";
-import CustomInput from "../components/CustomInput";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import * as yup from "yup";
-import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import { getMyDetails, login, resetUserState } from "../features/auth/authSlice";
+import { Form, Input, Checkbox, Button, Typography, Spin } from "antd";
+import { LockOutlined, UserOutlined,EyeOutlined,EyeInvisibleOutlined,LoadingOutlined } from "@ant-design/icons";
+import { login, resetUserState, getMyDetails } from "../features/auth/authSlice";
 
-let schema = yup.object().shape({
-  email: yup.string().email("Email should be valid").required("Email is Required"),
-  password: yup.string().required("Password is Required"),
-});
+const { Title } = Typography;
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-    validationSchema: schema,
-    onSubmit: (values) => {
-      dispatch(login(values));
-      
-    },
-  });
+  const [form] = Form.useForm();
   const authState = useSelector((state) => state);
 
-  const { user, isError, isLoginSuccess, isLoading, message } = authState.auth;
-useEffect(() => {
-  dispatch(getMyDetails());
-  dispatch(resetUserState());
-}, [dispatch]);
+  const { user, isError, isLoginSuccess, isLoginLoading, message } = authState.auth;
+
+  // useEffect(() => {
+  //   dispatch(getMyDetails());
+  //   dispatch(resetUserState());
+  // }, [dispatch]);
+
   useEffect(() => {
-    if (isLoginSuccess===true) {
+    if (isLoginSuccess === true) {
       navigate("admin");
-      // dispatch(resetUserState());
     } else {
       navigate("/");
-       dispatch(resetUserState());
+      dispatch(resetUserState());
     }
-    //  dispatch(resetUserState());
-  }, [dispatch,user, isError, isLoginSuccess, isLoading,navigate]);
-useEffect(() => {
-  if (user && user) {
-    navigate("admin");
-  }
-}, [navigate, user]);
+  }, [dispatch, isLoginSuccess, navigate]);
+
+  const handlePasswordToggle = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const onFinish = (values) => {
+    dispatch(login(values));
+  };
+
   return (
     <div className="py-5" style={{ background: "#ffd333", minHeight: "100vh" }}>
       <div className="container mx-auto p-20">
         <div className="my-5 w-full md:w-1/2 lg:w-1/3 bg-white rounded-lg mx-auto p-4">
-          <h3 className="text-center text-xl md:text-2xl font-bold">Login</h3>
+          <Title level={3} className="text-center font-bold">
+            Login
+          </Title>
           <p className="text-center mb-4">
-            Dear Admin,Login to your account to continue.
+            Dear Admin, Login to your account to continue.
           </p>
           <div className="error text-center mb-2">
             {message.message === "Rejected" ? "You are not an Admin" : ""}
           </div>
-          <form onSubmit={formik.handleSubmit}>
-            <CustomInput
-              type="text"
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            initialValues={{
+              email: "",
+              password: "",
+            }}
+          >
+            <Form.Item
               label="Email Address"
-              id="email"
               name="email"
-              onChng={formik.handleChange("email")}
-              onBlr={formik.handleBlur("email")}
-              val={formik.values.email}
-            />
-            <div className="error mt-2">
-              {formik.touched.email && formik.errors.email}
-            </div>
-            <CustomInput
-              type={showPassword ? "text" : "password"}
+              rules={[
+                {
+                  required: true,
+                  message: "Email is required",
+                },
+                {
+                  type: "email",
+                  message: "Please enter a valid email",
+                },
+              ]}
+            >
+              <Input prefix={<UserOutlined />} placeholder="Email" />
+            </Form.Item>
+            <Form.Item
               label="Password"
-              id="pass"
               name="password"
-              onChng={formik.handleChange("password")}
-              onBlr={formik.handleBlur("password")}
-              val={formik.values.password}
-            />
-            {/* Show/Hide Password Toggle */}
-            <div className="mt-2 d-flex align-items-center">
-              <input
-                type="checkbox"
-                id="showPassword"
-                checked={showPassword}
-                onChange={() => setShowPassword(!showPassword)}
-                className="mr-2"
+              rules={[
+                {
+                  required: true,
+                  message: "Password is required",
+                },
+              ]}
+            >
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="Password"
+                iconRender={(visible) =>
+                  visible ? (
+                    <EyeOutlined onClick={handlePasswordToggle} />
+                  ) : (
+                    <EyeInvisibleOutlined onClick={handlePasswordToggle} />
+                  )
+                }
               />
-              <label htmlFor="showPassword">Show Password</label>
-            </div>
-            <div className="error mt-2">
-              {formik.touched.password && formik.errors.password}
-            </div>
-            <div className="mb-3 text-end d-flex flex-column">
+            </Form.Item>
+            <Form.Item>
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
+            <div className="mb-3 text-end">
               <Link to="/forget-password" className="text-sm">
                 Forgot Password?
               </Link>
-              {/* <Link to="/reset-password" className="text-sm">
-                Reset Password?
-              </Link> */}
             </div>
-            <button
-              className="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 w-full rounded-md transition duration-300"
-              type="submit"
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="w-full"
+              loading={isLoginLoading}
               style={{
                 background: "#ffd333",
                 display: "block",
                 margin: "auto",
                 padding: "12px 58px",
                 width: "40%",
+                height:"100%"
               }}
             >
-              {isLoading ? "Loading....." : "Login"}
-            </button>
-          </form>
+              {isLoginLoading ? <Spin indicator={<LoadingOutlined />} /> : "Login"}
+            </Button>
+          </Form>
         </div>
       </div>
     </div>

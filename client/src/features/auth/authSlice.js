@@ -9,11 +9,12 @@ const initialState = {
   orders: [],
   isError: false,
   isLoading: false,
+  isLoginLoading: false,
   isSuccess: false,
   message: "",
   isLogoutSuccess: false,
   isLoginSuccess: false,
-  isGetMeSuccess:false
+  isGetMeSuccess: false,
 };
 export const login = createAsyncThunk(
   "auth/login",
@@ -75,7 +76,7 @@ export const authSlice = createSlice({
   extraReducers: (buildeer) => {
     buildeer
       .addCase(login.pending, (state) => {
-        state.isLoading = true;
+        state.isLoginLoading = true;
       })
       .addCase(logout.pending, (state) => {
         state.isLoading = true;
@@ -85,7 +86,7 @@ export const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.isError = false;
-        state.isLoading = false;
+        state.isLoginLoading = false;
         state.isLoginSuccess = true;
         state.user = action.payload;
         state.message = "success";
@@ -108,7 +109,7 @@ export const authSlice = createSlice({
         state.isError = true;
         state.isLoginSuccess = false;
         state.message = action.error;
-        state.isLoading = false;
+        state.isLoginLoading = false;
       })
       .addCase(logout.rejected, (state, action) => {
         state.isError = true;
