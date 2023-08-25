@@ -152,36 +152,33 @@ const handleRefreshToken = asyncHandler(async (req, res) => {
   });
 });
 
-// logout functionality
-
 const logout = asyncHandler(async (req, res) => {
   try {
-    const cookie = req.cookies;
-    // console.log(cookie)
-    // if (!cookie?.refreshToken) throw new Error("No Refresh Token in Cookies");
-    const refreshToken = cookie?.refreshToken;
-    const user = await User.findOne({ refreshToken });
-    if (!user) {
-      res.clearCookie("refreshToken", {
-        httpOnly: true,
-        secure: true,
-        
-      });
-      return res.sendStatus(204); // forbidden
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      return res.sendStatus(204); // No content
     }
-    await User.findOneAndUpdate(refreshToken, {
-      refreshToken: "",
-    });
+
+    const user = await User.findOneAndUpdate({ refreshToken }, { refreshToken: "" });
+
+    if (!user) {
+      return res.sendStatus(204); // No content
+    }
+
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: true,
-      
+      secure: process.env.NODE_ENV === "production", // Set based on your environment
+       // Set based on your requirements
     });
-    res.sendStatus(204); // forbidden
+
+    res.sendStatus(204); // No content
   } catch (error) {
-    console.log(error)
+    console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 });
+
 
 // Update a user
 //update pasword
